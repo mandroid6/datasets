@@ -44,7 +44,7 @@ class YesNo(tfds.core.GeneratorBasedBuilder):
 			description=_DESCRIPTION,
 			features=tfds.features.FeaturesDict({
 				"audio":tfds.features.Audio(),
-				"text": tfds.features.Text(encoder_config=self.builder_config.text_encoder_config)
+				"text": tfds.features.Text()
 			}),
 			urls=["http://www.openslr.org/1/"]
 		)
@@ -53,11 +53,8 @@ class YesNo(tfds.core.GeneratorBasedBuilder):
 	def _split_generators(self, dl_manager):
 		dl_url = _DL_URL
 		dl_paths = dl_manager.download_and_extract(dl_urls)
-		for filename in os.listdir(dl_paths):
-    		if filename.endswith('.wav'):
-				label =filename.split('.')[0].split('_')
-				labels.append(label)
-
+		
+		dl_paths[create_and_return_transcript_file
 		self.info.features["labels"] = labels
 
 		return [
@@ -82,4 +79,34 @@ class YesNo(tfds.core.GeneratorBasedBuilder):
 		]
 		
 	def _generate_examples(self):
-		pas
+		pass
+
+	def create_and_return_transcript_file(directory):
+		labels = []
+		for filename in os.listdir(directory):
+    		if filename.endswith('.wav'):
+				label =filename.split('.')[0].split('_')
+				labels.append(label)
+
+		output_file = open('transcript.txt', 'w')
+		for label in labels:
+			for ch in label:
+				output_file.write(str(ch))
+				output_file.write(' ')
+			output_file.write('\n')
+		output_file.close()
+
+		return os.path.join(directory,'transcript.txt')
+
+	def _walk_yesno_dir(directory):
+		"""Walk a YesNo directory and yield examples."""
+
+		directory = os.path.join(directory, 'YesNo')
+		
+		for path, _, files in tf.io.gfile.walk(directory):
+			if not files:
+				continue
+
+			
+
+
