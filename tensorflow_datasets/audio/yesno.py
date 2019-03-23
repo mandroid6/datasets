@@ -79,14 +79,48 @@ class YesNo(tfds.core.GeneratorBasedBuilder):
 		]
 		
 	def _generate_examples(self, directory):
-		transcript_file = create_and_return_transcript_file(directory):
+		#transcript_file = create_and_return_transcript_file(directory):
+		for example in _walk_yesno_dir(directory):
+			yeild {
+				"audio" = example.audio_file,
+				"labels"= example.transcript
+			}
 
-		#for 
+	YesNoExample = collections.namedtuple(
+    "_YesNoExample",["audio_file", "labels"])
+
+	def _walk_yesno_dir(directory):
+		"""Walk a YesNo directory and yield examples."""
+		directory = os.path.join(directory, "YesNo")
+		for path, _, files in tf.io.gfile.walk(directory):
+			if not files:
+				continue
+
+			transcript_file = [f for f in files if f.endswith(".txt")]
+			if not transcript_file:
+				continue
+			assert len(transcript_file) == 1
+			transcript_file, = transcript_file
+			transcripts = {}
+			with tf.io.gfile.GFile(os.path.join(path, transcript_file)) as f:
+				for line in f:
+					line = line.strip()
+					key, transcript = line.split(" ", 1)
+					transcripts[key] = transcript
+			audio_files = [f for f in files if  f.endswith(".wav")]
+			for audio_file in audio_files:
+				assert audio_file.endswith(".wav")
+				key = audio_file[:-len(".wav")]
+				transcript = transcripts[key]
+				yield YesNoExample(
+					audio_file=os.path.join(path, audio_file),
+					labels=transcript)
+
 
 	def create_and_return_transcript_file(directory):
 		labels = []
 		for filename in os.listdir(directory):
-    		if filename.endswith('.wav'):
+			if filename.endswith('.wav'):
 				label =filename.split('.')[0].split('_')
 				labels.append(label)
 
