@@ -44,7 +44,7 @@ class YesNo(tfds.core.GeneratorBasedBuilder):
 			description=_DESCRIPTION,
 			features=tfds.features.FeaturesDict({
 				"audio":tfds.features.Audio(),
-				"text": tfds.features.Text()
+				'labels': tfds.features.Sequence(tfds.features.ClassLabel(names=['no', 'yes'], len=8))
 			}),
 			urls=["http://www.openslr.org/1/"]
 		)
@@ -54,13 +54,13 @@ class YesNo(tfds.core.GeneratorBasedBuilder):
 		dl_url = _DL_URL
 		dl_paths = dl_manager.download_and_extract(dl_urls)
 		
-		dl_paths[create_and_return_transcript_file
-		self.info.features["labels"] = labels
+		#dl_paths[create_and_return_transcript_file
+		#self.info.features["labels"] = labels
 
 		return [
 			tfds.core.SplitGenerator(
 				name=tfds.Split.TRAIN,
-				num_shards=100,
+				num_shards=10,
 				gen_kwargs={
 					"dirs": dl_paths[tfds.Split.TRAIN],
 				}),
@@ -78,8 +78,10 @@ class YesNo(tfds.core.GeneratorBasedBuilder):
 				}),
 		]
 		
-	def _generate_examples(self):
-		pass
+	def _generate_examples(self, directory):
+		transcript_file = create_and_return_transcript_file(directory):
+
+		#for 
 
 	def create_and_return_transcript_file(directory):
 		labels = []
